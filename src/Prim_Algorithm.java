@@ -14,7 +14,6 @@ public class Prim_Algorithm {
         // 노드 연결 정보 추가
         init();
 
-        sortList();
         for(int i = 0; i < graph.size(); i++)
             System.out.println(graph.get(i));
 
@@ -38,9 +37,6 @@ public class Prim_Algorithm {
 
         }
 
-//        System.out.println(tList);
-
-
     }
 
     /**
@@ -51,36 +47,17 @@ public class Prim_Algorithm {
         for (int i = 0; i < V; i++)
             graph.add(new ArrayList<>());
 
-        // a <-> b, 3
-        graph.get(0).add(new Pair(1, 3));
-        graph.get(1).add(new Pair(0, 3));
-        // a <-> d, 2
-        graph.get(0).add(new Pair(3, 2));
-        graph.get(3).add(new Pair(0, 2));
-        // a <-> e, 4
-        graph.get(0).add(new Pair(4, 4));
-        graph.get(4).add(new Pair(0, 4));
-        // b <-> c, 1
-        graph.get(1).add(new Pair(2, 1));
-        graph.get(2).add(new Pair(1, 1));
-        // b <-> d, 4
-        graph.get(1).add(new Pair(3, 4));
-        graph.get(3).add(new Pair(1, 4));
-        // b <-> f, 2
-        graph.get(1).add(new Pair(5, 2));
-        graph.get(5).add(new Pair(1, 2));
-        // c <-> f, 1
-        graph.get(2).add(new Pair(5, 1));
-        graph.get(5).add(new Pair(2, 1));
-        // d <-> e, 5
-        graph.get(3).add(new Pair(4, 5));
-        graph.get(4).add(new Pair(3, 5));
-        // d <-> f, 7
-        graph.get(3).add(new Pair(5, 7));
-        graph.get(5).add(new Pair(3, 7));
-        // e <-> f, 9
-        graph.get(4).add(new Pair(5, 9));
-        graph.get(5).add(new Pair(4, 9));
+        // 노드 연결 정보 추가
+        addEdge(0, 1, 3);
+        addEdge(0, 3, 2);
+        addEdge(0, 4, 4);
+        addEdge(1, 2, 1);
+        addEdge(1, 3, 4);
+        addEdge(1, 5, 2);
+        addEdge(2, 5, 1);
+        addEdge(3, 4, 5);
+        addEdge(3, 5, 7);
+        addEdge(4, 5, 9);
 
         // 초기 기중치를 MAX로 설정
         Arrays.fill(distance, Integer.MAX_VALUE);
@@ -120,13 +97,12 @@ public class Prim_Algorithm {
         return minDistanceNode;
     }
 
-    private static void sortList() {
-        for(int i = 0; i < graph.size(); i++) {
-            List<Pair> pairs = graph.get(i);
-            Collections.sort(pairs, (p1, p2) -> {
-                return Integer.compare(p1.getV(), p2.getV());
-            });
-        }
+    /**
+     * 노드 간의 간선 추가
+     */
+    private static void addEdge(int u, int v, int w) {
+        graph.get(u).add(new Pair(v, w));
+        graph.get(v).add(new Pair(u, w));
     }
 }
 
