@@ -1,21 +1,24 @@
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Prim_Algorithm {
+    // 간선 정보를 담고 있는 graph
     private static List<List<Pair>> graph = new ArrayList<>();
-    private static final int V = 6; // 노드 개수
-    private static int[] distance = new int[V]; // 거리
-    private static List<Integer> tList = new ArrayList<>(); // T에 포함된 node
-    public static void main(String[] args) throws IOException {
+    // node 개수
+    private static final int V = 6;
+    // 간선 간의 distance -> 초기값 무한대
+    private static int[] distance = new int[V];
+    // T에 포함된 node
+    private static List<Integer> tList = new ArrayList<>();
 
-        // 노드 연결 정보 추가
+    public static void main(String[] args) {
+
+        // 출력용 buffer
+        StringBuilder sb = new StringBuilder();
+
+        // 노드 연결 정보 설정
         init();
-
-        for(int i = 0; i < graph.size(); i++)
-            System.out.println(graph.get(i));
 
         // 시작점을 C(index=2)로 잡는다
         int start = 2;
@@ -25,18 +28,26 @@ public class Prim_Algorithm {
         tList.add(start);
 
         // t에 모든 node가 포함되면 종료
-        while(tList.size() != V) {
+        while (tList.size() != V) {
             // 현재 node와 연결된 node들의 distance 수정
             modifyDistance(graph.get(start));
             // T에 포함되지 않은 node 중에서 distance가 가장 작은 node를 찾는다.
             int smallestNode = findSmallestNode();
+            /**
+             * 중요한 부분
+             * 간선과 연결된 노드를 추적하는 메서드
+             * 메서드 선언부에 설명한 주석 참고
+             */
+            int edgeNode = getConnectedNode(smallestNode);
+            sb.append(String.format("(%d %d %d)", edgeNode, smallestNode, distance[smallestNode]) + "\n");
+
             // T에 가장 가까운 점 추가
             tList.add(smallestNode);
-            System.out.println(String.format("(%d %d %d)", start, smallestNode, distance[smallestNode]));
+            // 다음 반복문을 수행할 node
             start = smallestNode;
-
         }
 
+        System.out.println(sb);
     }
 
     /**
@@ -64,17 +75,24 @@ public class Prim_Algorithm {
     }
 
     /**
+     * 노드 간의 간선 추가
+     */
+    private static void addEdge(int u, int v, int w) {
+        graph.get(u).add(new Pair(v, w));
+        graph.get(v).add(new Pair(u, w));
+    }
+
+    /**
      * 노드와 연결된 간선의 거리 수정
      * 기존의 distance 값과 현재 노드에서의 distance를 바교한다
-     * @param edge
      */
-    private static void modifyDistance(List<Pair> edge){
-        for(int i = 0; i < edge.size(); i++) {
+    private static void modifyDistance(List<Pair> edge) {
+        for (int i = 0; i < edge.size(); i++) {
             Pair pair = edge.get(i);
             int v = pair.getV();
             int w = pair.getW();
             // 현재 노드와 distance가 더 짧을 때
-            if(distance[v] > w)
+            if (distance[v] > w)
                 distance[v] = w;
         }
     }
@@ -85,11 +103,11 @@ public class Prim_Algorithm {
     private static int findSmallestNode() {
         int minDistance = Integer.MAX_VALUE;
         int minDistanceNode = -1;
-        for(int i = 0; i < V; i++) {
+        for (int i = 0; i < V; i++) {
             // 이미 t에 포함된 노드는 필요x
-            if(tList.contains(i))
+            if (tList.contains(i))
                 continue;
-            if(minDistance > distance[i]) {
+            if (minDistance > distance[i]) {
                 minDistance = distance[i];
                 minDistanceNode = i;
             }
@@ -98,11 +116,18 @@ public class Prim_Algorithm {
     }
 
     /**
-     * 노드 간의 간선 추가
+     * @Param smallestNode : 가장 작은 distance를 갖는 node
+     * distance가 가장 작은 smallestNode 가져왔을 때, 현재 node와 연결된 것인지 아니면 tList에 포함된 node 중에 연결된 것인지 확인해야한다.
+     * why? -> smallestNode의 distance가 현재 node에 의해 갱신이 된 distance인지, 아니면 tList에 포함된 node에 의해 수정된 것인지 반드시 확인해야한다.
      */
-    private static void addEdge(int u, int v, int w) {
-        graph.get(u).add(new Pair(v, w));
-        graph.get(v).add(new Pair(u, w));
+    private static int getConnectedNode(int smallestNode) {
+        for (int i = 0; i < graph.get(smallestNode).size(); i++) {
+            Pair pair = graph.get(smallestNode).get(i);
+            if (pair.getW() == distance[smallestNode]) {
+                return pair.getV();
+            }
+        }
+        return -1;
     }
 }
 
