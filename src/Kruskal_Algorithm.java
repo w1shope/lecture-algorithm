@@ -1,60 +1,36 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Kruskal_Algorithm {
-    // 노트(v1, v2), 가중치 저장
-    private static Pair[] graph;
-    // 입력 횟수 저장
-    private static List<String> inputs = new ArrayList<>();
+    private static final int V = 6;
+    private static int[][] graph = new int[V][V];
+    private static int[] parent = new int[V];
+    private static List<Pair> edgeList;
+    private static List<Pair> tList = new ArrayList<>();
 
-    private static int n;
-    // Cycle 여부 판단 -> Union Find
-    private static int[] parent;
-    private static final char[] alphabet = {'a', 'b', 'c', 'd', 'e', 'f'};
-
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) {
         StringBuilder sb = new StringBuilder();
 
-        // 콘솔창 입력
-        while (true) {
-            String input = br.readLine().replaceAll("\\D+", "");
-            if (input.isEmpty())
-                break;
-            inputs.add(input);
-        }
-        n = inputs.size();
-        graph = new Pair[n];
-        parent = new int[n];
-        for (int i = 0; i < n; i++)
-            parent[i] = i;
+        init();
+        edgeList = getEdgeList();
 
-        putEdge();
-
-        // 가중치 오름차순 정렬
-        Arrays.sort(graph, (p1, p2) -> p1.getW() - p2.getW());
-
-        // 모든 노트가 선택되면 종료
-        int count = 0;
-        for (int i = 0; i < n; i++) {
-            Pair pair = graph[i];
+        // 정렬된 간선으로부터 Tree를 확장한다.
+        for (int i = 0; i < edgeList.size(); i++) {
+            Pair pair = edgeList.get(i);
             int v1 = pair.getV1();
             int v2 = pair.getV2();
             int w = pair.getW();
-            /**
-             * Cycle 여부 판단 -> Union Find
-             * union() -> true: : cycle X
-             * union() -> false : cycle O
-             */
-            if (union(v1, v2)) {
-                count++;
-                if (count == alphabet.length)
-                    break;
-                sb.append(String.format("(%d, %d, %d)", v1, v2, w) + "\n");
+
+            // cycle 생성 여부를 확인한다
+            boolean isCycle = union(v1, v2);
+            // cycle 만들어지지 않을 때만 Tree에 확장시킨다.
+            if (!isCycle) {
+                tList.add(pair);
+                sb.append(String.format("(%d %d %d)\n", v1, v2, w));
+            }
+            // Tree에 포함된 간선 개수가 (노드 개수 -1)이면 종료한다.
+            if (tList.size() == V - 1) {
+                break;
             }
         }
 
@@ -62,41 +38,92 @@ public class Kruskal_Algorithm {
     }
 
     /**
-     * 간선 저장
+     * 가중치를 오름차순으로 리스트에 저장한다.
+     * 양방향 그래프이므로 b->c 엣지가 존재한다면 c->b는 리스트에 저장하면 안된다.
      */
-    private static void putEdge() {
-        for (int i = 0; i < n; i++) {
-            int v1 = Character.getNumericValue(inputs.get(i).charAt(0));
-            int v2 = Character.getNumericValue(inputs.get(i).charAt(1));
-            int w = Character.getNumericValue(inputs.get(i).charAt(2));
-            graph[i] = new Pair(v1, v2, w);
+    private static List<Pair> getEdgeList() {
+        // 모든 edge 저장
+        List<Pair> list = new ArrayList<>();
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                // 가중치 0 -> 연결된 간선 없음
+                if (graph[i][j] == 0)
+                    continue;
+                list.add(new Pair(i, j, graph[i][j]));
+            }
         }
+
+        // a-b 양방향 간선이 존재할 때, 한 방향의 간선만 저장한다.
+        return list.stream().filter(p -> p.getV1() < p.getV2()).
+                sorted((e1, e2) -> {
+                    if (e1.getW() == e2.getW())
+                        return Integer.compare(e1.getV1(), e2.getV1());
+                    return Integer.compare(e1.getW(), e2.getW());
+                })
+                .collect(Collectors.toList());
     }
 
     /**
-     * 부모 노드 반환
+     * 초기 설정
+     */
+    private static void init() {
+
+        // 노드에 대한 모든 엣지를 입력 받는다.
+        addEdge(1, 2, 1);
+        addEdge(2, 5, 1);
+        addEdge(1, 5, 2);
+        addEdge(0, 3, 2);
+        addEdge(3, 4, 3);
+        addEdge(0, 4, 4);
+        addEdge(1, 3, 4);
+        addEdge(3, 5, 7);
+        addEdge(0, 1, 8);
+        addEdge(4, 5, 9);
+
+        // Cycle 여부 확인을 위해 Union-Find 알고리즘을 사용한다.
+        for (int i = 0; i < V; i++)
+            parent[i] = i;
+    }
+
+    /**
+     * 양방향 가중치 그래프 설정
+     */
+    private static void addEdge(int v1, int v2, int w) {
+        graph[v1][v2] = w;
+        graph[v2][v1] = w;
+    }
+
+    /**
+     * @Param v -> v노드가 포함된 집합의 부모 노드를 반환한다
      */
     private static int find(int v) {
         if (parent[v] == v)
             return v;
-        return find(parent[v]);
+        return parent[v] = find(parent[v]);
     }
 
     /**
-     * 부모 노드가 동일한지 여부에 따라 true/false 반환
-     * 부모 노드 동일 -> cycle이 생기므로 return false
-     * 부모 노드 다름 -> cycle이 생기지 않으므로 return true
+     * Union-Find
+     * 두 노드가 같은 집합에 포함되어 있는지 확인한다
+     * 같은 집합 : cycle을 만든다 -> return false
+     * 다른 집합 : cycle을 만들 수 없음 -> return true
      */
     private static boolean union(int v1, int v2) {
-        v1 = find(v1);
-        v2 = find(v2);
-        if (v1 == v2)
+        int a = find(v1);
+        int b = find(v2);
+
+        // 부모 노드는 두 노드 중에 더 작은 숫자로 설정한다.
+        if (find(a) != find(b)) {
+            if (a > b)
+                parent[a] = b;
+            else
+                parent[b] = a;
             return false;
-        if (v1 < v2)
-            parent[v2] = v1;
-        return true;
+        } else
+            return true;
     }
 }
+
 
 class Pair {
     private int v1;
@@ -119,5 +146,14 @@ class Pair {
 
     public int getW() {
         return w;
+    }
+
+    @Override
+    public String toString() {
+        return "Pair{" +
+                "v1=" + v1 +
+                ", v2=" + v2 +
+                ", w=" + w +
+                '}';
     }
 }
