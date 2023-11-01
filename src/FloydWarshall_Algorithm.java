@@ -3,7 +3,7 @@ import java.util.Arrays;
 public class FloydWarshall_Algorithm {
     static final int NUMBER = 10; // 자역 개수
     static final int MAX_NUM = Integer.MAX_VALUE; // 최대 값
-    static final String[] locations = {"서울", "천안", "원주", "강릉", "부산", "대전", "대구", "포항", "광주", "부산"};
+    static final String[] locations = {"서울", "천안", "원주", "강릉", "논산", "대전", "대구", "포항", "광주", "부산"};
     static int[][] local = {
             {0, 12, 15, MAX_NUM, MAX_NUM, MAX_NUM, MAX_NUM, MAX_NUM, MAX_NUM, MAX_NUM},
             {12, 0, MAX_NUM, MAX_NUM, 4, 10, MAX_NUM, MAX_NUM, MAX_NUM, MAX_NUM},
