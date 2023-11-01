@@ -39,7 +39,7 @@ public class Prim_Algorithm {
              * 메서드 선언부에 설명한 주석 참고
              */
             int edgeNode = getConnectedNode(smallestNode);
-            sb.append(String.format("(%d %d %d)", edgeNode, smallestNode, distance[smallestNode]) + "\n");
+            sb.append(String.format("(%d, %d, %d)", edgeNode, smallestNode, distance[smallestNode]) + "\n");
 
             // T에 가장 가까운 점 추가
             tList.add(smallestNode);
