@@ -1,6 +1,8 @@
+import java.util.Arrays;
+
 public class FloydWarshall_Algorithm {
     static final int NUMBER = 10; // 자역 개수
-    static final int MAX_NUM = Integer.MAX_VALUE; // 최대 값
+    static final int MAX_NUM = 100000; // 최대 값
     static final String[] locations = {"서울", "천안", "원주", "강릉", "논산", "대전", "대구", "포항", "광주", "부산"}; // 지역 정보
     // 양방향 간선 정보
     static int[][] local = {
@@ -25,15 +27,30 @@ public class FloydWarshall_Algorithm {
             for (int i = 0; i < NUMBER; i++) {
                 // j : 도착 노드
                 for (int j = 0; j < NUMBER; j++) {
-                    int distance = local[i][node] + local[node][j];
-                    // i->j거리와 i -> node -> j 거리를 비교해서 더 짧은 거리를 저장
-                    if (distance >= 0 && distance < local[i][j])
-                        local[i][j] = distance;
+                    int oldDistance = local[i][j]; // 기존 거리
+                    int newDistance = local[i][node] + local[node][j]; // 거쳐 가는 거리
+                    // i->j 거리와 i -> node -> j 거리를 비교해서 더 짧은 거리를 저장
+                    local[i][j] = Math.min(oldDistance, newDistance);
                 }
             }
         }
 
-        for (int i = 0; i < NUMBER; i++)
-            System.out.println(locations[i] + ": " + local[i][0]);
+//        for (int i = 0; i < NUMBER; i++)
+//            sb.append(locations[i] + ": " + local[i][0] + "\n");
+//        System.out.println(sb);
+
+        sb.append("\t\t");
+        Arrays.stream(locations).forEach(name -> sb.append(name + "\t\t"));
+        sb.append("\n");
+        for (int i = 0; i < NUMBER; i++) {
+            sb.append(locations[i] + "\t\t");
+            for(int j = 0; j <= i; j++)
+                sb.append("\t\t");
+            for (int j = i + 1; j < NUMBER; j++) {
+                sb.append(local[i][j] + "\t\t");
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb);
     }
 }
