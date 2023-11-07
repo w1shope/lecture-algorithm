@@ -21,6 +21,8 @@ public class FloydWarshall_Algorithm {
     public static void main(String[] args) {
         StringBuilder sb = new StringBuilder();
 
+        long startTime = System.currentTimeMillis();
+
         // node : 거쳐 갈 노드
         for (int node = 0; node < NUMBER; node++) {
             // i : 시작 노드
@@ -29,28 +31,28 @@ public class FloydWarshall_Algorithm {
                 for (int j = 0; j < NUMBER; j++) {
                     int oldDistance = local[i][j]; // 기존 거리
                     int newDistance = local[i][node] + local[node][j]; // 거쳐 가는 거리
-                    // i->j 거리와 i -> node -> j 거리를 비교해서 더 짧은 거리를 저장
-                    local[i][j] = Math.min(oldDistance, newDistance);
+                    local[i][j] = Math.min(oldDistance, newDistance); // i->j 거리와 i -> node -> j 거리를 비교해서 더 짧은 거리를 저장
                 }
             }
         }
-
-//        for (int i = 0; i < NUMBER; i++)
-//            sb.append(locations[i] + ": " + local[i][0] + "\n");
-//        System.out.println(sb);
 
         sb.append("\t\t");
         Arrays.stream(locations).forEach(name -> sb.append(name + "\t\t"));
         sb.append("\n");
         for (int i = 0; i < NUMBER; i++) {
             sb.append(locations[i] + "\t\t");
-            for(int j = 0; j <= i; j++)
+            for (int j = 0; j <= i; j++)
                 sb.append("\t\t");
             for (int j = i + 1; j < NUMBER; j++) {
                 sb.append(local[i][j] + "\t\t");
             }
             sb.append("\n");
         }
+
+        long endTime = System.currentTimeMillis(); // 종료 시간
+        long totalTime = (endTime - startTime) / 1000; // 수행 시간
+
         System.out.println(sb);
+        System.out.println("소요시간 : " + totalTime);
     }
 }
