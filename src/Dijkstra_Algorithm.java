@@ -64,7 +64,7 @@ public class Dijkstra_Algorithm {
         }
 
         long endTime = System.currentTimeMillis(); // 종료 시간
-        long totalTime = (endTime - startTime) / 1000; // 수행 시간
+        double totalTime = (endTime - startTime) / 1000.0; // 수행 시간
 
         System.out.println(sb);
         System.out.println("소요시간 : " + totalTime);
