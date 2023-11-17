@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +8,7 @@ public class HeapSortAlgorithm {
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("/Users/hope/Desktop/IdeaProjects/Algorithm/src/input.txt"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/hope/Desktop/IdeaProjects/Algorithm/src/output.txt"));
         String str;
         List<Integer> tmp = new ArrayList<>();
         while ((str = br.readLine()) != null)
@@ -30,7 +29,10 @@ public class HeapSortAlgorithm {
         }
 
         for (int i = 0; i < nums.length; i++)
-            System.out.println(nums[i]);
+            bw.write(nums[i] + "\n");
+
+        bw.close();
+        br.close();
     }
 
     /**
