@@ -27,7 +27,6 @@ public class HeapSortAlgorithm {
             swap(heapSize - 1);
             heapSize -= 1;
             heapify(heapSize);
-            downHeap(i);
         }
 
         for (int i = 0; i < nums.length; i++)
