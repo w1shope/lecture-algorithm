@@ -1,7 +1,5 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TravelingSalesmanProblemAlgorithm {
     static final int NUM = 8; // 노드 개수
@@ -16,6 +14,7 @@ public class TravelingSalesmanProblemAlgorithm {
 
         int startNode = 0; // 시작 노드
         visited[startNode] += 1; // 방문 회수 + 1
+        result.add(0);
         while (visited[0] < 2) { // 출발 시에 시작점 방문 1번, 1번씩 방문 후 시작점 방문 1번 -> 2번 방문시 종료
             int nextNode = getMoveNodeIndex(startNode); // 현재 노드에서 이동할 노드 반환
             visited[nextNode] += 1; // 노드 이동 후 방문 횟수 1 증가
@@ -23,10 +22,25 @@ public class TravelingSalesmanProblemAlgorithm {
             result.add(startNode);
         }
 
-        System.out.println("현재 노드 : A");
-        result.stream().distinct()
-                .mapToInt(Integer::valueOf)
-                .forEach(node -> System.out.println("현재 노드 : " + (char) (node + 65)));
+        LinkedHashSet<Integer> set = new LinkedHashSet<>(); // 노드 방문 순서 유지하는 HashSet
+        for (int i = 0; i < result.size(); i++)
+            set.add(result.get(i));
+        set.add(0); // 중복 노드를 제거하면서 시작 노드가 제거되었으므로, 다시 추가 한다.
+        List<Integer> resultList = set.stream().collect(Collectors.toList());
+        resultList.add(0);
+
+        StringBuffer sb = new StringBuffer();
+        int prev = 0;
+        double distance = 0d; // 총 이동 거리
+        for (int i = 0; i < resultList.size(); i++) {
+            System.out.println("현재 노드 : " + resultList.get(i));
+            distance += getDistance(pairs.get(prev), pairs.get(resultList.get(i)));
+            sb.append(prev + " -> " + resultList.get(i) + " 이동 거리 : " + getDistance(pairs.get(prev), pairs.get(resultList.get(i))) + "\n");
+            prev = resultList.get(i);
+        }
+        System.out.println();
+        System.out.print(sb.toString());
+        System.out.println("총 이동 거리 : " + distance);
     }
 
     /**
